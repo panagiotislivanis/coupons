@@ -27,4 +27,4 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
-          REPO_PATH: /path/to/your/repo
+          REPO_PATH: /var/repo
