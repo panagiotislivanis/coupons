@@ -30,8 +30,19 @@ jobs:
             sudo apt-get install -y docker-compose
           fi
 
-          # Clone repo αν δεν υπάρχει
-          if [ ! -d $REPO_PATH/.git ]; then
+          # Έλεγχος αν υπάρχει ο φάκελος και διαχείριση
+          if [ -d $REPO_PATH ]; then
+            echo "'$REPO_PATH' exists."
+            if [ -d "$REPO_PATH/.git" ]; then
+              echo "Updating existing repository..."
+              cd $REPO_PATH
+              git pull || { echo 'Git pull failed'; exit 1; }
+            else
+              echo "Error: '$REPO_PATH' exists but is not a git repository."
+              exit 1
+            fi
+          else
+            echo "Cloning repository..."
             git clone https://github.com/panagiotislivanis/coupons.git $REPO_PATH || { echo 'Cloning failed'; exit 1; }
           fi
           
