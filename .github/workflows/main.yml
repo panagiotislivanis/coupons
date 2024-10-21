@@ -3,7 +3,7 @@ name: Deploy to DigitalOcean
 on:
   push:
     branches:
-      - master  # Ή το branch που χρησιμοποιείς για το deployment
+      - main  # Ή το branch που χρησιμοποιείς για το deployment
 
 jobs:
   deploy:
