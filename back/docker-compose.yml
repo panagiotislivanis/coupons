@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" # Ή οποιαδήποτε θύρα θες να χρησιμοποιήσεις
+    volumes:
+      - .:/app # Για να αντιγράφονται τα αρχεία
+    environment:
+      - ENV_VAR=value # Αν έχεις μεταβλητές περιβάλλοντος
