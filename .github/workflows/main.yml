@@ -18,7 +18,7 @@ jobs:
       - name: Deploy to server
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP << 'EOF'
-          # Install Docker and Docker Compose if not already installed
+          # Εγκατάσταση Docker και Docker Compose αν δεν είναι ήδη εγκατεστημένα
           if ! command -v docker &> /dev/null; then
             echo "Docker not found, installing..."
             sudo apt-get update
@@ -30,15 +30,32 @@ jobs:
             sudo apt-get install -y docker-compose
           fi
 
-          # Clone repo if not exists
+          # Clone repo αν δεν υπάρχει
           if [ ! -d $REPO_PATH/.git ]; then
             git clone https://github.com/panagiotislivanis/coupons.git $REPO_PATH || { echo 'Cloning failed'; exit 1; }
           fi
           
-          cd $REPO_PATH/back
+          cd $REPO_PATH
           echo 'Current directory: ' $(pwd)
           ls -l
-          /snap/bin/docker-compose up --build -d
+
+          # Δημιουργία του φακέλου back αν δεν υπάρχει
+          if [ ! -d "back" ]; then
+            echo "Creating back directory..."
+            mkdir back
+          fi
+
+          cd back
+          echo 'Current directory after changing: ' $(pwd)
+          ls -l
+          
+          # Εκτέλεση Docker Compose
+          if [ -f "docker-compose.yml" ]; then
+            /snap/bin/docker-compose up --build -d
+          else
+            echo "Error: 'docker-compose.yml' file does not exist in 'back' directory."
+            exit 1
+          fi
           EOF
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
