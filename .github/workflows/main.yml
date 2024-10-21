@@ -33,13 +33,15 @@ jobs:
           # Έλεγχος αν υπάρχει ο φάκελος και διαχείριση
           if [ -d $REPO_PATH ]; then
             echo "'$REPO_PATH' exists."
+            echo "Contents of '$REPO_PATH':"
+            ls -l $REPO_PATH
             if [ -d "$REPO_PATH/.git" ]; then
               echo "Updating existing repository..."
               cd $REPO_PATH
               git pull || { echo 'Git pull failed'; exit 1; }
             else
-              echo "Error: '$REPO_PATH' exists but is not a git repository. Deleting it."
-              rm -rf $REPO_PATH
+              echo "Error: '$REPO_PATH' exists but is not a git repository. Attempting to delete it."
+              rm -rf $REPO_PATH || { echo 'Failed to delete existing directory'; exit 1; }
               echo "Cloning repository..."
               git clone https://github.com/panagiotislivanis/coupons.git $REPO_PATH || { echo 'Cloning failed'; exit 1; }
             fi
