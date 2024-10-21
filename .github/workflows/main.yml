@@ -18,8 +18,8 @@ jobs:
       - name: Deploy to server
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "
-          if [ ! -d $REPO_PATH ]; then
-            git clone <https://github.com/panagiotislivanis/coupons.git> $REPO_PATH
+          if [ ! -d $REPO_PATH/.git ]; then
+            git clone <your-git-repo-url> $REPO_PATH
           fi
           cd $REPO_PATH && git pull && docker-compose up --build -d
           "
@@ -27,4 +27,4 @@ jobs:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
-          REPO_PATH: /var/repo
+          REPO_PATH: /path/to/your/repo
