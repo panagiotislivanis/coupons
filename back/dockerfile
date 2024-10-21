@@ -1,0 +1,20 @@
+# Επιλογή της βάσης
+FROM python:3.11-slim
+
+# Ρύθμιση του working directory
+WORKDIR /app
+
+# Αντίγραψε τα requirements
+COPY requirements.txt .
+
+# Εγκατάσταση των απαιτήσεων
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Αντίγραψε όλο τον κώδικα της εφαρμογής
+COPY . .
+
+# Άνοιγμα της θύρας
+EXPOSE 5000
+
+# Εκτέλεση της εφαρμογής
+CMD ["python", "back/main.py"]
