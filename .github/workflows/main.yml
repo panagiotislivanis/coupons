@@ -21,10 +21,10 @@ jobs:
           if [ ! -d $REPO_PATH/.git ]; then
             git clone https://github.com/panagiotislivanis/coupons.git $REPO_PATH
           fi
-          cd $REPO_PATH/back && git pull && docker-compose -f docker-compose.yml up --build -d
+          cd $REPO_PATH/back && git pull && /snap/bin/docker-compose -f docker-compose.yml up --build -d
           "
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
-          REPO_PATH: /var/repo/coupons # Το path στον server που κλωνοποιείται το repo
+          REPO_PATH: /var/repo/coupons
