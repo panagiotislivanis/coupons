@@ -38,8 +38,10 @@ jobs:
               cd $REPO_PATH
               git pull || { echo 'Git pull failed'; exit 1; }
             else
-              echo "Error: '$REPO_PATH' exists but is not a git repository."
-              exit 1
+              echo "Error: '$REPO_PATH' exists but is not a git repository. Deleting it."
+              rm -rf $REPO_PATH
+              echo "Cloning repository..."
+              git clone https://github.com/panagiotislivanis/coupons.git $REPO_PATH || { echo 'Cloning failed'; exit 1; }
             fi
           else
             echo "Cloning repository..."
