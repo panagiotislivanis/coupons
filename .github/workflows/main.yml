@@ -1,0 +1,23 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - master  # Ή το branch που χρησιμοποιείς για το deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run deployment script
+      env:
+        SSH_USER: ${{ secrets.SSH_USER }}
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+        REPO_PATH: '/repo'
+      run: |
+        echo "$SSH_PASSWORD" | ssh -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "cd $REPO_PATH && git pull && docker-compose up --build -d"
