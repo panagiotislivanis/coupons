@@ -14,7 +14,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install sshpass
-        run: sudo apt-get install -y sshpass  # Εγκατάσταση sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass  # Εγκατάσταση sshpass
 
       - name: Copy files to server
         env:
@@ -32,4 +34,23 @@ jobs:
       - name: Set up Python on server
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
-    
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "sudo apt-get update && sudo apt-get install -y python3-pip"  # Εγκατάσταση pip αν δεν υπάρχει
+
+      - name: Install dependencies on server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "pip3 install --upgrade pip && pip3 install -r /var/repo/requirements.txt"  # Εγκατάσταση εξαρτήσεων
+
+      - name: Restart the application
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "sudo systemctl restart myapp"
