@@ -1,79 +1,43 @@
-name: Deploy
+name: Deploy Python App
 
 on:
   push:
     branches:
-      - main
+      - main  # Αντικατάστησε το "main" με το όνομα της κύριας branch σου
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'  # Αντικατάστησε με την έκδοση Python που χρειάζεσαι
 
-      - name: Deploy to server
+      - name: Install dependencies
         run: |
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP << 'EOF'
-          # Εγκατάσταση Docker και Docker Compose αν δεν είναι ήδη εγκατεστημένα
-          if ! command -v docker &> /dev/null; then
-            echo "Docker not found, installing..."
-            sudo apt-get update
-            sudo apt-get install -y docker.io
-          fi
-          
-          if ! command -v docker-compose &> /dev/null; then
-            echo "Docker Compose not found, installing..."
-            sudo apt-get install -y docker-compose
-          fi
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-          # Έλεγχος αν υπάρχει ο φάκελος και διαχείριση
-          if [ -d $REPO_PATH ]; then
-            echo "'$REPO_PATH' exists."
-            echo "Contents of '$REPO_PATH':"
-            ls -l $REPO_PATH
-            if [ -d "$REPO_PATH/.git" ]; then
-              echo "Updating existing repository..."
-              cd $REPO_PATH
-              git pull || { echo 'Git pull failed'; exit 1; }
-            else
-              echo "Error: '$REPO_PATH' exists but is not a git repository. Attempting to delete it."
-              rm -rf $REPO_PATH || { echo 'Failed to delete existing directory'; exit 1; }
-              echo "Cloning repository..."
-              git clone https://github.com/panagiotislivanis/coupons.git $REPO_PATH || { echo 'Cloning failed'; exit 1; }
-            fi
-          else
-            echo "Cloning repository..."
-            git clone https://github.com/panagiotislivanis/coupons.git $REPO_PATH || { echo 'Cloning failed'; exit 1; }
-          fi
-          
-          cd $REPO_PATH
-          echo 'Current directory: ' $(pwd)
-          ls -l
-
-          # Δημιουργία του φακέλου back αν δεν υπάρχει
-          if [ ! -d "back" ]; then
-            echo "Creating back directory..."
-            mkdir back
-          fi
-
-          cd back
-          echo 'Current directory after changing: ' $(pwd)
-          ls -l
-          
-          # Εκτέλεση Docker Compose
-          if [ -f "docker-compose.yml" ]; then
-            /snap/bin/docker-compose up --build -d
-          else
-            echo "Error: 'docker-compose.yml' file does not exist in 'back' directory."
-            exit 1
-          fi
-          EOF
+      - name: Copy files to server
         env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          SSH_USER: ${{ secrets.SSH_USER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}  # Ρύθμισε το SERVER_IP στα GitHub secrets
+          USERNAME: ${{ secrets.USERNAME }}     # Ρύθμισε το USERNAME στα GitHub secrets
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }} # Ρύθμισε το PRIVATE_KEY στα GitHub secrets
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "mkdir -p /var/repo"
+          scp -o StrictHostKeyChecking=no -r ./* $USERNAME@$SERVER_IP:/var/repo
+
+      - name: Restart the application
+        env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
-          REPO_PATH: /var/repo/coupons
+          USERNAME: ${{ secrets.USERNAME }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "sudo systemctl restart myapp"
