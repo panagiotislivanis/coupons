@@ -13,16 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'  # Αντικατάστησε με την έκδοση Python που χρειάζεσαι
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Ελέγξτε αν το requirements.txt βρίσκεται στον ριζικό φάκελο
-
       - name: Copy files to server
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}  # Ρύθμισε το SERVER_IP στα GitHub secrets
@@ -36,6 +26,20 @@ jobs:
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "mkdir -p /var/repo"
           # Αντιγραφή όλων των αρχείων εκτός από αυτά που δεν χρειάζονται (π.χ. .git, .github)
           rsync -av --exclude='.git/' --exclude='.github/' . $USERNAME@$SERVER_IP:/var/repo
+
+      - name: Set up Python on server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          USERNAME: ${{ secrets.USERNAME }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "sudo apt-get update && sudo apt-get install -y python3-pip"  # Εγκατάσταση pip αν δεν υπάρχει
+
+      - name: Install dependencies on server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          USERNAME: ${{ secrets.USERNAME }}
+        run: |
+          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "pip3 install --upgrade pip && pip3 install -r /var/repo/requirements.txt"  # Εγκατάσταση εξαρτήσεων
 
       - name: Restart the application
         env:
