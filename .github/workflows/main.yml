@@ -28,7 +28,7 @@ jobs:
           sshpass -p ${{ secrets.PASSWORD }} ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "mkdir -p /var/repo"
 
           # Αντιγραφή όλων των αρχείων στον φάκελο στον server
-          sshpass -p ${{ secrets.PASSWORD }} scp -r ./* ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:/var/repo
+          sshpass -p ${{ secrets.PASSWORD }} scp -r ./* ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:/var/repo/
 
       - name: Install dependencies on server
         run: |
