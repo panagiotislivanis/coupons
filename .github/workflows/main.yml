@@ -3,7 +3,51 @@ name: Deploy Python App
 on:
   push:
     branches:
+      - mainname: Deploy Python App
+
+on:
+  push:
+    branches:
       - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'  # Αλλάξτε την έκδοση Python ανάλογα
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Deploy to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22  # Αν χρησιμοποιείς διαφορετική θύρα, ενημέρωσέ το
+          source: "dist/*"
+          target: "/var/repo"
+
+      - name: Execute commands on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/repo
+            # Εκτέλεσε εντολές για την εκκίνηση της εφαρμογής
+            sudo systemctl restart your_service  # Αν χρησιμοποιείς systemd
+
 
 jobs:
   deploy:
