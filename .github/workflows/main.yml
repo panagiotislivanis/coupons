@@ -13,10 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.9'  # Αλλάξτε την έκδοση Python ανάλογα
+      - name: Install sshpass
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
 
       - name: Deploy to server
         run: |
@@ -26,9 +26,9 @@ jobs:
           
           # Δημιουργία φακέλου στον server
           sshpass -p ${{ secrets.PASSWORD }} ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "mkdir -p /var/repo"
-          
-          # Αντιγραφή όλων των αρχείων εκτός από αυτά που δεν χρειάζονται (π.χ. .git, .github)
-          sshpass -p ${{ secrets.PASSWORD }} rsync -av --exclude='.git/' --exclude='.github/' ./ ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:/var/repo
+
+          # Αντιγραφή όλων των αρχείων στον φάκελο στον server
+          sshpass -p ${{ secrets.PASSWORD }} scp -r ./* ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:/var/repo/
 
       - name: Install dependencies on server
         run: |
