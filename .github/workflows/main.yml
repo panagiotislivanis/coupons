@@ -18,9 +18,7 @@ jobs:
         with:
           python-version: '3.9'  # Αλλάξτε την έκδοση Python ανάλογα
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
+     
       - name: Build the application
         run: python setup.py sdist bdist_wheel
 
@@ -37,3 +35,9 @@ jobs:
             scp -r dist/* user@server:/var/repo
             # Εκτελέστε εντολές για την εκκίνηση της εφαρμογής
             sudo systemctl restart your_service  # Αν χρησιμοποιείτε systemd
+
+
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
