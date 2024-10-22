@@ -3,7 +3,7 @@ name: Deploy Python App
 on:
   push:
     branches:
-      - main  # Αντικατάστησε το "main" με το όνομα της κύριας branch σου
+      - main  # Αντικαταστήστε το "main" με το όνομα της κύριας branch σας
 
 jobs:
   deploy:
