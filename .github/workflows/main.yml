@@ -37,3 +37,4 @@ jobs:
       - name: Restart application
         run: |
           sshpass -p ${{ secrets.PASSWORD }} ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "cd /var/repo && sudo systemctl restart your_service"  # Αν χρησιμοποιείς systemd
+
