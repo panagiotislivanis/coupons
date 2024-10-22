@@ -9,8 +9,11 @@ def login():
     data = request.get_json()
     username = data['username']
     password = data['password']
-
     if User.login(username, password):
-        return jsonify({'message': 'Login successful!'}), 200
+        if User.IsAdmin(username):
+            return jsonify({"success": True, "role": True})
+        else:
+            return jsonify({"success": True, "role": False})
+
     else:
-        return jsonify({'message': 'Invalid username or password!'}), 401
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401

@@ -47,3 +47,22 @@ class User:
             return True  # Επιστροφή True αν η σύνδεση είναι επιτυχής
         else:
             return False  # Επιστροφή False αν η σύνδεση αποτύχει
+
+    @staticmethod
+    def IsAdmin(username):
+        conn = mysql.connector.connect(
+            host=Config.DB_HOST,
+            user=Config.DB_USER,
+            password=Config.DB_PASSWORD,
+            database=Config.DB_NAME
+        )
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT role FROM Users WHERE username = %s", (username,))
+        result = cursor.fetchone()
+
+        if result[0] == 'Admin':
+            return True  # Επιστροφή True αν η σύνδεση είναι επιτυχής
+        else:
+            return False  # Επιστροφή False αν η σύνδεση αποτύχει
