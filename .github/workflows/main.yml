@@ -3,7 +3,7 @@ name: Deploy Python App
 on:
   push:
     branches:
-      - main  # Αντικαταστήστε το "main" με το όνομα της κύριας branch σας
+      - main
 
 jobs:
   deploy:
@@ -13,22 +13,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'  # Αλλάξτε την έκδοση Python ανάλογα
 
-      - name: Check sshpass installation
-        run: sshpass -V  # Έλεγχος αν το sshpass είναι εγκατεστημένο
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: Print environment variables
-        env:
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-          USERNAME: ${{ secrets.USERNAME }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-        run: |
-          echo "Using SERVER_IP: $SERVER_IP"
-          echo "Using USERNAME: $USERNAME"  # Βεβαιώσου ότι το USERNAME δεν είναι κενό
+      - name: Build the application
+        run: python setup.py sdist bdist_wheel
 
-      - name: Create directory on server
-        env:
-          SERVER_IP: ${{ secrets.SERVER_IP }}  # Ρύθμισε το SERVER_IP στα GitHub secrets
-          USERNAME: ${{ secrets.USERNAME }}     # Ρύθμισε το USERNAME στα Git
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p /var/repo
+            cd /var/repo
+            rm -rf *
+            scp -r dist/* user@server:/var/repo
+            # Εκτελέστε εντολές για την εκκίνηση της εφαρμογής
+            sudo systemctl restart your_service  # Αν χρησιμοποιείτε systemd
