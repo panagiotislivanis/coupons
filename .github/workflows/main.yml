@@ -23,7 +23,7 @@ jobs:
           echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           # Δημιουργία φακέλου στον server
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "mkdir -p /var/repo"
+          ssh -o StrictHostKeyChecking=no -v $USERNAME@$SERVER_IP "mkdir -p /var/repo"
           # Αντιγραφή όλων των αρχείων εκτός από αυτά που δεν χρειάζονται (π.χ. .git, .github)
           rsync -av --exclude='.git/' --exclude='.github/' . $USERNAME@$SERVER_IP:/var/repo
 
@@ -32,18 +32,18 @@ jobs:
           SERVER_IP: ${{ secrets.SERVER_IP }}
           USERNAME: ${{ secrets.USERNAME }}
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "sudo apt-get update && sudo apt-get install -y python3-pip"  # Εγκατάσταση pip αν δεν υπάρχει
+          ssh -o StrictHostKeyChecking=no -v $USERNAME@$SERVER_IP "sudo apt-get update && sudo apt-get install -y python3-pip"  # Εγκατάσταση pip αν δεν υπάρχει
 
       - name: Install dependencies on server
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
           USERNAME: ${{ secrets.USERNAME }}
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "pip3 install --upgrade pip && pip3 install -r /var/repo/requirements.txt"  # Εγκατάσταση εξαρτήσεων
+          ssh -o StrictHostKeyChecking=no -v $USERNAME@$SERVER_IP "pip3 install --upgrade pip && pip3 install -r /var/repo/requirements.txt"  # Εγκατάσταση εξαρτήσεων
 
       - name: Restart the application
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
           USERNAME: ${{ secrets.USERNAME }}
         run: |
-          ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "sudo systemctl restart myapp"
+          ssh -o StrictHostKeyChecking=no -v $USERNAME@$SERVER_IP "sudo systemctl restart myapp"
