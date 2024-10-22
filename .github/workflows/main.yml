@@ -16,14 +16,21 @@ jobs:
       - name: Install sshpass
         run: sudo apt-get install -y sshpass
 
+      - name: Print environment variables
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          echo "Using SERVER_IP: $SERVER_IP"
+          echo "Using USERNAME: $USERNAME"  # Βεβαιώσου ότι το USERNAME δεν είναι κενό
+
       - name: Copy files to server
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}  # Ρύθμισε το SERVER_IP στα GitHub secrets
           USERNAME: ${{ secrets.USERNAME }}     # Ρύθμισε το USERNAME στα GitHub secrets
           PASSWORD: ${{ secrets.PASSWORD }}     # Ρύθμισε το PASSWORD στα GitHub secrets
         run: |
-          echo "Using SERVER_IP: $SERVER_IP"
-          echo "Using USERNAME: $USERNAME"
           # Δημιουργία φακέλου στον server
           sshpass -p $PASSWORD ssh $USERNAME@$SERVER_IP "mkdir -p /var/repo"
           # Αντιγραφή όλων των αρχείων εκτός από αυτά που δεν χρειάζονται (π.χ. .git, .github)
