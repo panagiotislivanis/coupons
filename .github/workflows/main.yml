@@ -18,16 +18,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y sshpass
 
+      - name: Check secrets
+        run: |
+          echo "Using SERVER_IP: ${{ secrets.SERVER_IP }}"
+          echo "Using USERNAME: ${{ secrets.USERNAME }}"
+          echo "Using PASSWORD: ${{ secrets.PASSWORD }}"
+
       - name: Deploy to server
         run: |
           echo "Deploying to server..."
-          echo "Using SERVER_IP: ${{ secrets.SERVER_IP }}"
-          echo "Using USERNAME: ${{ secrets.USERNAME }}"
-
-          # Δημιουργία φακέλου στον server
           sshpass -p "${{ secrets.PASSWORD }}" ssh "${{ secrets.USERNAME }}"@"${{ secrets.SERVER_IP }}" "mkdir -p /var/repo"
-
-          # Αντιγραφή όλων των αρχείων στον φάκελο στον server
           sshpass -p "${{ secrets.PASSWORD }}" scp -r ./* "${{ secrets.USERNAME }}"@"${{ secrets.SERVER_IP }}":/var/repo/
 
       - name: Install dependencies on server
