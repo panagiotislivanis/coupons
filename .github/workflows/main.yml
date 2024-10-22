@@ -3,7 +3,7 @@ name: Deploy Python App
 on:
   push:
     branches:
-      - main  # Αντικαταστήστε το "main" με το όνομα της κύριας branch σας 
+      - main  # Αντικαταστήστε το "main" με το όνομα της κύριας branch σας
 
 jobs:
   deploy:
@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
 
       - name: Copy files to server
         env:
