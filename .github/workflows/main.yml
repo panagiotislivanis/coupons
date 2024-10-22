@@ -23,18 +23,17 @@ jobs:
           echo "Deploying to server..."
           echo "Using SERVER_IP: ${{ secrets.SERVER_IP }}"
           echo "Using USERNAME: ${{ secrets.USERNAME }}"
-          
+
           # Δημιουργία φακέλου στον server
-          sshpass -p ${{ secrets.PASSWORD }} ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "mkdir -p /var/repo"
+          sshpass -p "${{ secrets.PASSWORD }}" ssh "${{ secrets.USERNAME }}"@"${{ secrets.SERVER_IP }}" "mkdir -p /var/repo"
 
           # Αντιγραφή όλων των αρχείων στον φάκελο στον server
-          sshpass -p ${{ secrets.PASSWORD }} scp -r ./* ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }}:/var/repo/
+          sshpass -p "${{ secrets.PASSWORD }}" scp -r ./* "${{ secrets.USERNAME }}"@"${{ secrets.SERVER_IP }}":/var/repo/
 
       - name: Install dependencies on server
         run: |
-          sshpass -p ${{ secrets.PASSWORD }} ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "cd /var/repo && pip install -r requirements.txt"
+          sshpass -p "${{ secrets.PASSWORD }}" ssh "${{ secrets.USERNAME }}"@"${{ secrets.SERVER_IP }}" "cd /var/repo && pip install -r requirements.txt"
 
       - name: Restart application
         run: |
-          sshpass -p ${{ secrets.PASSWORD }} ssh ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "cd /var/repo && sudo systemctl restart your_service"  # Αν χρησιμοποιείς systemd
-
+          sshpass -p "${{ secrets.PASSWORD }}" ssh "${{ secrets.USERNAME }}"@"${{ secrets.SERVER_IP }}" "cd /var/repo && sudo systemctl restart your_service"  # Αν χρησιμοποιείς systemd
