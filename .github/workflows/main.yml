@@ -13,11 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install sshpass
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y sshpass  # Εγκατάσταση sshpass
-
       - name: Copy files to server
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}  # Ρύθμισε το SERVER_IP στα GitHub secrets
@@ -37,7 +32,10 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
         run: |
-          sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "sudo apt-get update && sudo apt-get install -y python3-pip && pip3 install --upgrade pip && pip3 install -r /var/repo/requirements.txt"
+          # Εγκατάσταση python3 και pip στο server
+          sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "sudo apt-get update && sudo apt-get install -y python3 python3-pip"
+          # Εγκατάσταση των απαιτούμενων πακέτων
+          sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "pip3 install --upgrade pip && pip3 install -r /var/repo/requirements.txt"
 
       - name: Restart the application
         env:
