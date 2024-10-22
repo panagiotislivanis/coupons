@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt  # Ελέγξτε αν το requirements.txt βρίσκεται στον ριζικό φάκελο
 
       - name: Copy files to server
         env:
@@ -32,8 +32,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          # Δημιουργία φακέλου στον server
           ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER_IP "mkdir -p /var/repo"
-          scp -o StrictHostKeyChecking=no -r ./* $USERNAME@$SERVER_IP:/var/repo
+          # Αντιγραφή όλων των αρχείων εκτός από αυτά που δεν χρειάζονται (π.χ. .git, .github)
+          rsync -av --exclude='.git/' --exclude='.github/' . $USERNAME@$SERVER_IP:/var/repo
 
       - name: Restart the application
         env:
